@@ -1,0 +1,5 @@
+export * from './getAll.controller'
+export * from './getOne.controller'
+export * from './createUser.controller'
+export * from './updateUser.controller'
+export * from './deleteUser.controller'

@@ -1,0 +1,5 @@
+export * from './getAllTours.controller'
+export * from './createTour.controller'
+export * from './getOneTour.controller'
+export * from './updateTour.controller'
+export * from './deleteTour.controller'
