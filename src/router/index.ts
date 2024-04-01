@@ -1,13 +1,14 @@
 import express from "express";
-import {createNewTour, getOneTour,deleteTour,getAllTours,updateTour} from "../controller/Tours/tours.controller";
-import { checkBody } from "../middlewares/Tours/checkBody";
+import { getAllTours,createTour,deleteTour,getOneTour,UpdateTour } from "../controller/Tours/tours.controller";
+import { topCheap } from "../middlewares/topCheap";
 
 
-export const router = express.Router();
+export const tourRouter = express.Router();
 
 
 
-// router.param('id',checkId)
+tourRouter.route('/top-5-cheaps').get(topCheap,getAllTours)
 
-router.route("/").get(getAllTours).post(createNewTour);
-router.route("/:id").get(getOneTour).patch(updateTour).delete(deleteTour);
+tourRouter.route("/").get(getAllTours).post(createTour);
+tourRouter.route("/:id").delete(deleteTour).get(getOneTour).patch(UpdateTour);
+

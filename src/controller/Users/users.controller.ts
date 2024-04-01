@@ -1,5 +1,35 @@
-export * from './getAll.controller'
-export * from './getOne.controller'
-export * from './createUser.controller'
-export * from './updateUser.controller'
-export * from './deleteUser.controller'
+import { Request, Response } from "express";
+export const getAllUsers = (req: Request, res: Response) => {
+  res.status(500).json({
+    status: "error",
+    message: "This route is not defined yet",
+  });
+};
+
+export const createNewUser = (req: Request, res: Response) => {
+  res.status(500).json({
+    status: "error",
+    message: "This route is not defined yet",
+  });
+};
+
+export const getOneUser = (req: Request, res: Response) => {
+  res.status(500).json({
+    status: "error",
+    message: "This route is not defined yet",
+  });
+};
+
+export const updateUser = (req: Request, res: Response) => {
+  res.status(500).json({
+    status: "error",
+    message: "This route is not defined yet",
+  });
+};
+
+export const deleteUser = (req: Request, res: Response) => {
+  res.status(500).json({
+    status: "error",
+    message: "This route is not defined yet",
+  });
+};
