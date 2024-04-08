@@ -2,16 +2,18 @@ import { Tour } from "../../Model/Tour";
 import { Request, Response } from "express";
 import { APIFeatures } from "../../utils/ApiFeatures";
 
-export const getAllTours = async (req: any, res: Response):Promise<void> => {
-
+export const getAllTours = async (req: any, res: Response): Promise<void> => {
   try {
-
-    const features = new APIFeatures(Tour.find(),req.query).filter().sort().paginate().limitFields()
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .paginate()
+      .limitFields();
     const tours = await features.query;
     res.status(200).send({
       status: "success",
       createdAt: req.requestTime,
-      result: tours.length ,
+      result: tours.length,
       data: {
         tours,
       },
@@ -24,12 +26,45 @@ export const getAllTours = async (req: any, res: Response):Promise<void> => {
   }
 };
 
-export const getOneTour = async (req: Request, res: Response):Promise<void> => {
+export const getOneTour = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const tour = await Tour.findById(req.params.id);
     res.status(200).json({
       status: "success",
       data: tour,
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: "failed",
+      message: error,
+    });
+  }
+};
+
+export const getTourStats = async (req: Request, res: Response) => {
+  try {
+    const stats = await Tour.aggregate([
+      { $match: { rating: { $gte: 4.5 } } },
+      {
+        $group: {
+          _id: '$difficulty',
+          numTours: { $sum: 1 },
+          numRatings: { $sum: "$rating" },
+          avgRating: { $avg: "$rating" },
+          avgPrice: { $avg: "$price" },
+          minPrice: { $min: "$price" },
+          maxPrice: { $max: "$price" },
+        },
+      },
+    ]);
+    res.status(200).json({
+      status: "success",
+      data: {
+        stats,
+      },
     });
   } catch (error) {
     res.status(404).json({
@@ -57,7 +92,10 @@ export const createTour = async (
   }
 };
 
-export const UpdateTour = async (req: Request, res: Response):Promise<void> => {
+export const UpdateTour = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -76,7 +114,10 @@ export const UpdateTour = async (req: Request, res: Response):Promise<void> => {
   }
 };
 
-export const deleteTour = async (req: Request, res: Response):Promise<void> => {
+export const deleteTour = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const tour = await Tour.findByIdAndDelete(req.params.id);
     res.status(204).json({
