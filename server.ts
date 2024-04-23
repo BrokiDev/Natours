@@ -1,13 +1,9 @@
-import dotenv from 'dotenv'
 import app from "./src/app";
-import mongoose from "mongoose";
-
-dotenv.config({path: './.env'})
+import { dbConfig } from "./src/config/dbConnect";
 
 
-mongoose.connect(process.env.DATABASE!,{}).then(()=> console.info('Connected To The Database Successfully'))
 
-
+dbConfig()
 const port = process.env.PORT || 3000;
 
 

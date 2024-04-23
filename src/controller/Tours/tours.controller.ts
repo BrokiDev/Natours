@@ -1,9 +1,11 @@
 import { Tour } from "../../Model/Tour";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { APIFeatures } from "../../utils/ApiFeatures";
+import { RequestExt } from "../../interfaces/reqExtend";
+import { catchAsync } from "../../helpers/catchAsync";
 
-export const getAllTours = async (req: any, res: Response): Promise<void> => {
-  try {
+export const getAllTours = catchAsync(
+  async (req: RequestExt, res: Response, next: NextFunction): Promise<void> => {
     const features = new APIFeatures(Tour.find(), req.query)
       .filter()
       .sort()
@@ -18,39 +20,26 @@ export const getAllTours = async (req: any, res: Response): Promise<void> => {
         tours,
       },
     });
-  } catch (error) {
-    res.status(400).json({
-      status: "failed",
-      message: error,
-    });
   }
-};
+);
 
-export const getOneTour = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const getOneTour = catchAsync(
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const tour = await Tour.findById(req.params.id);
     res.status(200).json({
       status: "success",
       data: tour,
     });
-  } catch (error) {
-    res.status(404).json({
-      status: "failed",
-      message: error,
-    });
   }
-};
+);
 
-export const getTourStats = async (req: Request, res: Response) => {
-  try {
+export const getTourStats = catchAsync(
+  async (req: Request, res: Response, Next: NextFunction) => {
     const stats = await Tour.aggregate([
       { $match: { rating: { $gte: 4.5 } } },
       {
         $group: {
-          _id: '$difficulty',
+          _id: "$difficulty",
           numTours: { $sum: 1 },
           numRatings: { $sum: "$rating" },
           avgRating: { $avg: "$rating" },
@@ -66,16 +55,11 @@ export const getTourStats = async (req: Request, res: Response) => {
         stats,
       },
     });
-  } catch (error) {
-    res.status(404).json({
-      status: "failed",
-      message: error,
-    });
   }
-};
+);
 
-export const getMonthlyPlan = async (req: Request, res: Response) =>  {
-  try {
+export const getMonthlyPlan = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const year = Number(req.params.year);
     const plan = await Tour.aggregate([
       {
@@ -114,38 +98,21 @@ export const getMonthlyPlan = async (req: Request, res: Response) =>  {
         plan,
       },
     });
-  } catch (error) {
-    res.status(404).json({
-      status: "failed",
-      message: error,
-    });
   }
+);
 
-}
-
-export const createTour = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const createTour = catchAsync(
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const tour = await Tour.create(req.body);
     res.status(201).json({
       status: "success",
       tour,
     });
-  } catch (error) {
-    res.status(400).json({
-      status: "failed",
-      message: error,
-    });
   }
-};
+);
 
-export const UpdateTour = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const UpdateTour = catchAsync(
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -155,29 +122,15 @@ export const UpdateTour = async (
       status: "success",
       tour,
     });
-  } catch (error) {
-    console.log(error);
-    res.status(404).json({
-      status: "failed",
-      message: error,
-    });
   }
-};
+);
 
-export const deleteTour = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const deleteTour = catchAsync(
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const tour = await Tour.findByIdAndDelete(req.params.id);
     res.status(204).json({
       status: "success",
       data: null,
     });
-  } catch (error) {
-    res.status(404).json({
-      status: "failed",
-      message: "Error Invalid ID or Not Found",
-    });
   }
-};
+);

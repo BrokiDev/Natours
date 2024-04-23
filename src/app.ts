@@ -3,11 +3,10 @@ import {Response,Request,NextFunction} from 'express'
 import { tourRouter } from "./router/index";
 import morgan from "morgan";
 import {usersRouter} from './router/users'
+import { AppError } from "./utils/appError";
+import { RequestExt } from "./interfaces/reqExtend";
+import { errorMiddleware } from "./middlewares/errorMiddleware";
 
-interface ErrorCustom extends Error {
-  status?:string,
-  statusCode?:number
-}
 
 const app = express();
 
@@ -24,7 +23,7 @@ app.use(express.json());
 app.use(express.static(`${__dirname}/public/`))
 
 
-app.use((req: any, res:Response, next:NextFunction) => {
+app.use((req:RequestExt,res:Response,next:NextFunction) => {
   req.requestTime = new Date().toLocaleString();
   next();
 });
@@ -39,21 +38,15 @@ app.use('/api/v1/users',usersRouter);
 
 
 app.all('*',(req:Request,res:Response,next:NextFunction) => {
-  const err:ErrorCustom = new Error(`Can't find the route ${req.originalUrl} on this server`);
-  err.status = 'fail',
-  err.statusCode = 404
-  next(err)
+  // const err:ErrorCustom = new Error(`Can't find the route ${req.originalUrl} on this server`);
+  // err.status = 'fail',
+  // err.statusCode = 404
+  next(new AppError(`Can't find the route ${req.originalUrl} on this server`,404))
 });
 
-app.use((err:any,req:Request,res:Response,next:NextFunction) => {
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || 'error';
 
-  res.status(err.statusCode).json({
-    status: err.status,
-    message:err.message
-  })
-})
+
+app.use(errorMiddleware)
 
 
 
