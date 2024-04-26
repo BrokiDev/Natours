@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { APIFeatures } from "../../utils/ApiFeatures";
 import { RequestExt } from "../../interfaces/reqExtend";
 import { catchAsync } from "../../helpers/catchAsync";
+import { AppError } from "../../utils/appError";
 
 export const getAllTours = catchAsync(
   async (req: RequestExt, res: Response, next: NextFunction): Promise<void> => {
@@ -26,6 +27,10 @@ export const getAllTours = catchAsync(
 export const getOneTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const tour = await Tour.findById(req.params.id);
+
+    if(!tour) {
+      return next(new AppError('No tour found with that ID ',404))
+    }
     res.status(200).json({
       status: "success",
       data: tour,
@@ -118,6 +123,10 @@ export const UpdateTour = catchAsync(
       runValidators: true,
     });
 
+    if(!tour) {
+      return next(new AppError('No tour found with that ID ',404))
+    }
+
     res.status(200).json({
       status: "success",
       tour,
@@ -128,6 +137,11 @@ export const UpdateTour = catchAsync(
 export const deleteTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const tour = await Tour.findByIdAndDelete(req.params.id);
+    
+    if(!tour) {
+      return next(new AppError('No tour found with that ID ',404))
+    }
+
     res.status(204).json({
       status: "success",
       data: null,

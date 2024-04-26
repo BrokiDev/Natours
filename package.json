@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.ts",
-    "start:prod": "NODE_ENV=production nodemon server.ts"
+    "dev": "set NODE_ENV=development && nodemon server.ts",
+    "start:prod": "set NODE_ENV=production && nodemon server.ts"
   },
   "author": "",
   "license": "ISC",
