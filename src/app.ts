@@ -7,17 +7,17 @@ import { AppError } from "./utils/appError";
 import { RequestExt } from "./interfaces/reqExtend";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
 
-
 const app = express();
 
 
 
+const env = String(process.env.NODE_ENV).trim()
+
 //1 Middlewares
-if(process.env.NODE_ENV === 'development') {
+if(env === 'development') {
   app.use(morgan('dev'));
 }
 
-console.log(process.env.NODE_ENV)
 
 
 
@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(express.static(`${__dirname}/public/`))
 
 
-app.use((req:RequestExt,res:Response,next:NextFunction) => {
+app.use((req:RequestExt,_res:Response,next:NextFunction) => {
   req.requestTime = new Date().toLocaleString();
   next();
 });

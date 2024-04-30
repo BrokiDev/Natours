@@ -10,7 +10,10 @@ const userSchema = new mongoose.Schema({
         type:String,
         unique:true,
         required:[true, 'Please provide your email'],
-        lowercase:true
+        lowercase:true,
+        validate: (value:string) => {
+            if(!value.includes('@')) throw new Error('Please provide a valid email')
+        }
     },
     photo: String,
     password: {
@@ -19,11 +22,15 @@ const userSchema = new mongoose.Schema({
         minlength:8
     },
     passwordConfirm: {
-        type:String,
+        type:String || undefined,
         required:[true, 'Please confirm your password'],
-        minlength:8
+        validate: {
+            validator: function(this:any,val:string) {
+                return val === this.password
+            },
+            message: 'Passwords are not the same'
+        }
     },
 })
-
 
 export const User = mongoose.model('Users',userSchema)
