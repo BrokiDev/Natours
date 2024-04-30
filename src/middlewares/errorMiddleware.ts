@@ -22,18 +22,18 @@ export const errorMiddleware = (
 
     if(error.name === 'CastError') {
       const message = `Invalid ${error.path}: ${error.value}`;
-      error = new AppError(message, 400);
+      return error = new AppError(message, 400);
     }
 
     if(error.code === 11000) {
       const message = `Duplicate field value: ${error.keyValue.name}. Please use another value!`;
-      error = new AppError(message, 400);
+      return error = new AppError(message, 400);
     }
 
     if(error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map((el: any) => el.message);
       const message = `Invalid input data. ${errors.join('. ')}`;
-      error = new AppError(message, 400);
+      return error = new AppError(message, 400);
     }
   }
 
