@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     password: {
         type:String,
         required:true,
-        minlength:8
+        minlength:8,
     },
     passwordConfirm: {
         type:String || undefined,
@@ -29,8 +29,15 @@ const userSchema = new mongoose.Schema({
                 return val === this.password
             },
             message: 'Passwords are not the same'
-        }
+        },
+        select:false
     },
+})
+
+userSchema.pre('find',function(next) {
+    this.select('-__v'),
+    this.select('-password')
+    next()
 })
 
 export const User = mongoose.model('Users',userSchema)

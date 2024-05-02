@@ -6,6 +6,8 @@ import {usersRouter} from './router/users'
 import { AppError } from "./utils/appError";
 import { RequestExt } from "./interfaces/reqExtend";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
+import { checkJwt } from "./middlewares/checkJwt";
+import { authRouter } from "./router/auth";
 
 const app = express();
 
@@ -32,8 +34,9 @@ app.use((req:RequestExt,_res:Response,next:NextFunction) => {
 
 
 
-app.use('/api/v1/tours',tourRouter);
+app.use('/api/v1/tours',checkJwt,tourRouter);
 app.use('/api/v1/users',usersRouter);
+app.use('/api/v1/auth',authRouter)
 
 
 
