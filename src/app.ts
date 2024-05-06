@@ -1,13 +1,12 @@
-import express  from "express";
-import {Response,Request,NextFunction} from 'express'
-import { tourRouter } from "./router/index";
+import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
-import {usersRouter} from './router/users'
-import { AppError } from "./utils/appError";
 import { RequestExt } from "./interfaces/reqExtend";
-import { errorMiddleware } from "./middlewares/errorMiddleware";
 import { checkJwt } from "./middlewares/checkJwt";
+import { errorMiddleware } from "./middlewares/errorMiddleware";
 import { authRouter } from "./router/auth";
+import { tourRouter } from "./router/index";
+import { usersRouter } from './router/users';
+import { AppError } from "./utils/appError";
 
 const app = express();
 
@@ -43,9 +42,6 @@ app.use('/api/v1/auth',authRouter)
 
 
 app.all('*',(req:Request,res:Response,next:NextFunction) => {
-  // const err:ErrorCustom = new Error(`Can't find the route ${req.originalUrl} on this server`);
-  // err.status = 'fail',
-  // err.statusCode = 404
   next(new AppError(`Can't find the route ${req.originalUrl} on this server`,404))
 });
 

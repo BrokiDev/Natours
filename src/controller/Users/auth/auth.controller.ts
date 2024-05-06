@@ -79,3 +79,19 @@ export const logoutController = catchAsync(async({headers}:Request,res:Response,
         message:'User Logged Out'
     })
 })
+
+export const forgotPasswordController = catchAsync(async({body}:Request,res:Response,next:NextFunction) => {
+    const {email} = body
+    const user = await User.findOne({email})
+
+    if(!email) {
+        return next(new AppError('There is no user with email address.',404))
+    }
+
+    const resetToken = user?.createPasswordResetToken()
+    await user?.save({validateBeforeSave:false})
+    res.status(200).json({
+        status:'success',
+        message:'Token Sent to email'
+    })
+})
