@@ -59,11 +59,8 @@ export const signUpController = catchAsync(
     res.status(200).json({
         status:'success',
         token,
-        data: {
-            email:dataFind?.email,
-            name:dataFind?.name,
+        user: {
             id:dataFind?._id
-
         }
     })
   } )

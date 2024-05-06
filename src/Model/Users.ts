@@ -1,7 +1,17 @@
 import mongoose from "mongoose";
 
+export interface IUser {
+    name: string;
+    email: string;
+    photo: string;
+    password: string;
+    passwordConfirm: string;
+    passwordChangedAt: Date;
+    changePasswordAfter: (JWTTimestamp: number) => boolean;
+}
 
-const userSchema = new mongoose.Schema({
+
+const userSchema = new mongoose.Schema<IUser>({
     name: {
         type:String,
         required: [true, 'Please provide your name']
@@ -32,6 +42,8 @@ const userSchema = new mongoose.Schema({
         },
         select:false
     },
+    passwordChangedAt: Date,
+
 })
 
 userSchema.pre('find',function(next) {
@@ -39,5 +51,14 @@ userSchema.pre('find',function(next) {
     this.select('-password')
     next()
 })
+
+userSchema.methods.changePasswordAfter = function(JWTTimestamp:number) {
+    if(this.passwordChangedAt) {
+        const changedTimestamp = (this.passwordChangedAt.getTime() / 1000, 10)
+        return JWTTimestamp < changedTimestamp
+    }
+    return false
+}
+
 
 export const User = mongoose.model('Users',userSchema)
