@@ -8,8 +8,8 @@ export interface IUser {
   password: string;
   passwordConfirm: string;
   passwordChangedAt: Date;
-  passwordResetToken: string;
-  passwordResetExpires: Date;
+  passwordResetToken: string | undefined;
+  passwordResetExpires: Date | undefined;
   changePasswordAfter: (JWTTimestamp: number) => boolean;
   createPasswordResetToken: () => void;
   role: string;
