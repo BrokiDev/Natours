@@ -17,7 +17,7 @@ const transporter = createTransport({
 })
 
 const mailOptions = {
-    from: '"Madison Foo Koch 👻" <broki@brokitest.com>',
+    from: '"APPLICATION BROKE" <mailtrap@demomailtrap.com>',
     to: option.email,
     subject: option.subject,
     text: option.message
