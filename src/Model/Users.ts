@@ -26,7 +26,8 @@ const userSchema = new mongoose.Schema<IUser>({
     required: [true, "Please provide your email"],
     lowercase: true,
     validate: (value: string) => {
-      if (!value.includes("@")) throw new Error("Please provide a valid email");
+      const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+      return emailRegex.test(value);
     },
   },
   photo: String,
@@ -61,9 +62,14 @@ userSchema.pre("find", function (next) {
   next();
 });
 
+// userSchema.pre('findOne', function(next) {
+//   this.select('-__v'),this.select('-password')
+//   next();
+// })
+
 userSchema.methods.changePasswordAfter = function (JWTTimestamp: number) {
   if (this.passwordChangedAt) {
-    const changedTimestamp = (this.passwordChangedAt.getTime() / 1000, 10);
+    const changedTimestamp = ((this.passwordChangedAt.getTime() / 1000).toString(),10);
     return JWTTimestamp < changedTimestamp;
   }
   return false;
@@ -83,9 +89,10 @@ userSchema.methods.createPasswordResetToken = function () {
 };
 
 userSchema.pre('save',function(next){
-    if(this.isModified('password') || this.isNew) return next()
-
-        this.passwordChangedAt = new Date(Date.now() - 1000);
+  if (!this.isModified('password') && !this.isNew) {
+    this.passwordChangedAt = new Date(Date.now() - 1000);
+  }
+  next();
 })
 
 export const User = mongoose.model("Users", userSchema);

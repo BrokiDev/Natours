@@ -6,7 +6,10 @@ import { generateToken } from "../../../helpers/jwt.service";
 import { AppError } from "../../../utils/appError";
 import { sendEmail } from "../../../utils/Emails";
 import { createHash } from "crypto";
-import { token } from "morgan";
+import {config} from 'dotenv'
+
+config({path:'.env'})
+
 
 export const signUpController = catchAsync(
   async ({ body }: Request, res: Response, next: NextFunction) => {
@@ -38,6 +41,12 @@ export const signUpController = catchAsync(
         },
       },
     });
+
+    await sendEmail({
+      email: newUser.email,
+      subject: "Welcome to the Application",
+      message: "Welcome to the Application",
+    });
   }
 );
 
@@ -52,10 +61,12 @@ export const loginController = catchAsync(
     }
 
     const dataFind = await User.findOne({ email });
+
     const passwordEncrypt = await verifyPassword(
-      password,
+      `${password}`,
       `${dataFind?.password}`
     );
+
 
     if (!dataFind || !passwordEncrypt) {
       return next(new AppError("Invalid Credentials", 401));
@@ -91,9 +102,9 @@ export const logoutController = catchAsync(
 export const forgotPasswordController = catchAsync(
   async ({ body }: Request, res: Response, next: NextFunction) => {
     const { email } = body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({email:email});
 
-    if (!email) {
+    if (email !== user?.email) {
       return next(new AppError("There is no user with email address.", 404));
     }
 
@@ -140,8 +151,12 @@ export const resetPasswordController = catchAsync(
         return next(new AppError('Token invalid or has expired',400))
     }
 
-    user.password = body.password;
-    user.passwordConfirm = body.passwordConfirm;
+    console.log(process.env.SALTS_ROUND);
+
+    const passwordEncrypt = await encryptPassword(body.password, Number(process.env.SALTS_ROUND));
+
+    user.password = passwordEncrypt;
+    user.passwordConfirm = passwordEncrypt;
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save()
@@ -149,7 +164,6 @@ export const resetPasswordController = catchAsync(
 
     const tokenLogged = generateToken(`${user?._id}`);
 
-    console.log(token)
     res.status(200).json({
       status: "success",
       token:tokenLogged,

@@ -14,7 +14,6 @@ const app = express();
 
 const env = String(process.env.NODE_ENV).trim()
 
-//1 Middlewares
 if(env === 'development') {
   app.use(morgan('dev'));
 }
@@ -41,7 +40,7 @@ app.use('/api/v1/auth',authRouter)
 
 
 
-app.all('*',(req:Request,res:Response,next:NextFunction) => {
+app.all('*',(req:Request,_res:Response,next:NextFunction) => {
   next(new AppError(`Can't find the route ${req.originalUrl} on this server`,404))
 });
 

@@ -6,7 +6,7 @@ import { RequestExt } from "../interfaces/reqExtend";
 import { AppError } from "../utils/appError";
 
 export const checkJwt = catchAsync(
-  async (req: RequestExt, res: Response, next: NextFunction) => {
+  async (req: RequestExt, _res: Response, next: NextFunction) => {
     const jwtByUser = req.headers.authorization;
     const jwt = jwtByUser?.split(" ").pop();
     const validateToken = verifyToken(`${jwt}`);
@@ -22,7 +22,6 @@ export const checkJwt = catchAsync(
 
     (req as RequestExt).user = currentUser;
 
-    console.log("User is authenticated", req.user);
     next(); 
   }
 );
