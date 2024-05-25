@@ -7,7 +7,7 @@ export interface IUser {
   photo: string;
   password: string;
   passwordConfirm: string;
-  passwordChangedAt: Date;
+  passwordChangedAt: Date | string;
   passwordResetToken: string | undefined;
   passwordResetExpires: Date | undefined;
   changePasswordAfter: (JWTTimestamp: number) => boolean;

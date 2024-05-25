@@ -1,4 +1,4 @@
-import e, { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { AppError } from "../utils/appError";
 
 export const errorMiddleware = (
@@ -35,6 +35,14 @@ export const errorMiddleware = (
       const message = `Invalid input data. ${errors.join('. ')}`;
       return error = new AppError(message, 400);
     }
+    
+  }
+
+  if(err.message === 'jwt malformed') {
+    return res.status(401).json({
+      status:'error',
+      message:'Unauthorized'
+    })
   }
 
   res.status(err.statusCode).json({

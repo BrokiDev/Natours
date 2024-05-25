@@ -1,12 +1,13 @@
-import { Request, Response, NextFunction } from "express";
+import { createHash } from "crypto";
+import { config } from 'dotenv';
+import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../../helpers/catchAsync";
-import { User } from "../../../Model/Users";
 import { encryptPassword, verifyPassword } from "../../../helpers/encrypt";
 import { generateToken } from "../../../helpers/jwt.service";
+import { User } from "../../../Model/Users";
 import { AppError } from "../../../utils/appError";
 import { sendEmail } from "../../../utils/Emails";
-import { createHash } from "crypto";
-import {config} from 'dotenv'
+import { RequestExt } from "../../../interfaces/reqExtend";
 
 config({path:'.env'})
 
@@ -145,7 +146,7 @@ export const resetPasswordController = catchAsync(
     const { token } = params;
 
     const hashedToken = createHash("sha256").update(token).digest("hex");
-    const user = await User.findOne({passwordResetToken:hashedToken, passwordResetExpires: {$gt:Date.now()}})
+    const user = await User.findOne({passwordResetToken:hashedToken, passwordResetExpires: {$gt:new Date().toLocaleString()}})
 
     if(!user) {
         return next(new AppError('Token invalid or has expired',400))
@@ -172,3 +173,41 @@ export const resetPasswordController = catchAsync(
 
 
   });
+
+  export const updatePassword = catchAsync(async(req:RequestExt,res:Response,next:NextFunction)=> {
+    const {currentPassword,newPassword,passwordConfirm} = req.body; 
+
+    const user = await User.findById(req.user)
+
+    if(!user) return next(new AppError('User not found',404))
+
+      if(newPassword !== passwordConfirm) return next(new AppError('The newPassword and passwordConfirm must be the same',400))
+
+    const passwordHashed = await verifyPassword(currentPassword,`${user?.password}`)
+
+    if(!passwordHashed) return next(new AppError('The Password entered is wrong',403));
+
+    const passwordEncrypt = await encryptPassword(newPassword,Number(process.env.SALTS_ROUND))
+
+    user.password = passwordEncrypt
+    user.passwordConfirm = passwordEncrypt
+    user.passwordChangedAt = new Date().toLocaleString()
+    await user.save();
+
+
+    const tokenLogged = generateToken(`${user._id}`)
+
+    res.status(200).json({
+      status:'success',
+      token:tokenLogged,
+      data: {
+        user:{
+          id:user._id,
+          name:user.name,
+          email:user.email,
+          role:user.role
+        }
+      }
+    })
+    
+  })
