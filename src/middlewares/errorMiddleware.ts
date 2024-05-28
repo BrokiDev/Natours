@@ -45,6 +45,13 @@ export const errorMiddleware = (
     })
   }
 
+  if(err.message === 'jwt expired') {
+    return res.status(400).json({
+      status:'error',
+      message:'session expired, please login again'
+    })
+  }
+
   res.status(err.statusCode).json({
     status: err.status,
     message: err.message,

@@ -45,6 +45,8 @@ export const updateUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+export const updateMe = catchAsync(async(req:Request,res:Response,next:NextFunction)=> {})
+
 export const deleteUser = catchAsync(
   async ({ params }: Request, res: Response, next: NextFunction) => {
     const { id } = params;
