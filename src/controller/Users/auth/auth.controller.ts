@@ -152,7 +152,6 @@ export const resetPasswordController = catchAsync(
         return next(new AppError('Token invalid or has expired',400))
     }
 
-    console.log(process.env.SALTS_ROUND);
 
     const passwordEncrypt = await encryptPassword(body.password, Number(process.env.SALTS_ROUND));
 

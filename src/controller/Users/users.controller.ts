@@ -1,6 +1,23 @@
 import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../helpers/catchAsync";
 import { IUser, User } from "../../Model/Users";
+import { AppError } from "../../utils/appError";
+import { RequestExt } from "../../interfaces/reqExtend";
+
+interface ObjectI {
+  [key:string]:string
+}
+
+const filterObj = (obj:ObjectI,...allowed:any[]) => {
+  const newObj:ObjectI = {};
+  Object.keys(obj).forEach((el)=> {
+    if(allowed.includes(el)) newObj[el] = obj[el];
+
+  })
+  return newObj;
+
+}
+
 export const getAllUsers = catchAsync(
   async (_req: Request, res: Response, next: NextFunction) => {
     const data = await User.find();
@@ -45,7 +62,22 @@ export const updateUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const updateMe = catchAsync(async(req:Request,res:Response,next:NextFunction)=> {})
+export const updateMe = catchAsync(async(req:RequestExt,res:Response,next:NextFunction)=> {
+  const allowedInfo = filterObj(req.body,'name','email')
+  if(req.body.password) {
+    return next(new AppError('This route is not for password updates. Please use/updateMyPassword',400))
+  }
+
+
+  const data = await User.findByIdAndUpdate(req.user,allowedInfo,{new:true,runValidators:true})
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: data,
+    },
+})
+})
 
 export const deleteUser = catchAsync(
   async ({ params }: Request, res: Response, next: NextFunction) => {

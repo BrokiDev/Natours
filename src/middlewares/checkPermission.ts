@@ -7,7 +7,6 @@ export const checkPermission = (...roles: string[]) => {
     const role = `${user?.role}`;
 
     if (!roles.includes(role)) {
-      console.log("here negative");
       return next(
         new AppError("You do not have permission to perform this action", 403)
       );
