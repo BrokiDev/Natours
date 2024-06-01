@@ -13,6 +13,10 @@ export interface IUser {
   changePasswordAfter: (JWTTimestamp: number) => boolean;
   createPasswordResetToken: () => void;
   role: string;
+  active:boolean
+  emailVerificationToken?: string;
+  createEmailVerificationToken: () => void;
+  emailVerificationTokenExpires?: Date;
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -55,17 +59,19 @@ const userSchema = new mongoose.Schema<IUser>({
   },
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type:Boolean,
+    select:false
+  },
+  emailVerificationToken: String,
+  emailVerificationTokenExpires: Date
 });
 
 userSchema.pre("find", function (next) {
-  this.select("-__v"), this.select("-password");
+  this.select("-__v"), this.select("-password"),
+  this.find({active:{$ne:false}});
   next();
 });
-
-// userSchema.pre('findOne', function(next) {
-//   this.select('-__v'),this.select('-password')
-//   next();
-// })
 
 userSchema.methods.changePasswordAfter = function (JWTTimestamp: number) {
   if (this.passwordChangedAt) {
@@ -88,11 +94,21 @@ userSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
+userSchema.methods.createEmailVerificationToken = function(){
+  const emailToken = crypto.randomBytes(32).toString('hex');
+  this.emailVerificationToken = crypto.createHash('sha256').update(emailToken).digest('hex');
+
+  console.log({emailToken},this.emailVerificationToken);
+
+this.emailVerificationTokenExpires = new Date(Date.now() + 10 * 60 * 1000);
+  return emailToken;
+}
+
 userSchema.pre('save',function(next){
-  if (!this.isModified('password') && !this.isNew) {
-    this.passwordChangedAt = new Date(Date.now() - 1000);
-  }
+  if (!this.isModified('password') || this.isNew) return next();
+  this.passwordChangedAt = new Date(Date.now() - 1000);
   next();
 })
+
 
 export const User = mongoose.model("Users", userSchema);
