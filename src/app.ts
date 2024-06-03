@@ -7,6 +7,7 @@ import { authRouter } from "./router/auth";
 import { tourRouter } from "./router/index";
 import { usersRouter } from './router/users';
 import { AppError } from "./utils/appError";
+import rateLimit from "express-rate-limit";
 
 const app = express();
 
@@ -25,8 +26,27 @@ app.use(express.json());
 app.use(express.static(`${__dirname}/public/`))
 
 
-app.use((req:RequestExt,_res:Response,next:NextFunction) => {
+
+
+const limiter = rateLimit({
+  windowMs: 15*60*1000,
+  limit:100,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: {
+    status: 'error',
+    message:'Too Many Request'
+  }
+
+})
+
+app.use(limiter)
+
+app.use((req:RequestExt,res:Response,next:NextFunction) => {
   req.requestTime = new Date().toLocaleString();
+  res.removeHeader('X-Powered-By')
+  res.removeHeader('RateLimit-Policy')
+  res.removeHeader('RateLimit')
   next();
 });
 
@@ -47,6 +67,9 @@ app.all('*',(req:Request,_res:Response,next:NextFunction) => {
 
 
 app.use(errorMiddleware)
+
+
+
 
 
 

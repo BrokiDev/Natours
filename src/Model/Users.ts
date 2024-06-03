@@ -61,14 +61,13 @@ const userSchema = new mongoose.Schema<IUser>({
   passwordResetExpires: Date,
   active: {
     type:Boolean,
-    select:false
   },
   emailVerificationToken: String,
   emailVerificationTokenExpires: Date
 });
 
 userSchema.pre("find", function (next) {
-  this.select("-__v"), this.select("-password"),
+  this.select("-__v"), this.select("-password"), this.select('-active')
   this.find({active:{$ne:false}});
   next();
 });

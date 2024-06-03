@@ -151,7 +151,7 @@ export const loginController = catchAsync(
       return next(new AppError("Invalid Credentials", 401));
     }
 
-    if (!dataFind.active) {
+    if (dataFind.active === false) {
       return next(new AppError("Your Account has been deactivated. Please contact with the support team", 401));
     }
 
@@ -163,6 +163,8 @@ export const loginController = catchAsync(
     if (!dataFind || !passwordEncrypt) {
       return next(new AppError("Invalid Credentials", 401));
     }
+
+
 
     const token = generateToken(`${dataFind?._id}`);
 
