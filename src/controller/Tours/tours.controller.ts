@@ -116,7 +116,7 @@ export const createTour = catchAsync(
   }
 );
 
-export const UpdateTour = catchAsync(
+export const updateTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
       new: true,

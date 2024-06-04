@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllTours,createTour,deleteTour,getOneTour,UpdateTour, getTourStats, getMonthlyPlan } from "../controller/Tours/tours.controller";
+import { getAllTours,createTour,deleteTour,getOneTour,updateTour, getTourStats, getMonthlyPlan } from "../controller/Tours/tours.controller";
 import { topCheap } from "../middlewares/topCheap";
 import { checkPermission } from "../middlewares/checkPermission";
 
@@ -13,5 +13,5 @@ tourRouter.route('/tour-stats').get(getTourStats)
 tourRouter.route('/monthly-plan/:year').get(getMonthlyPlan)
 
 tourRouter.route("/").get(getAllTours).post(createTour);
-tourRouter.route("/:id").delete(checkPermission('admin'|| 'moderator'),deleteTour).get(getOneTour).patch(checkPermission('admin'|| 'moderator'),UpdateTour);
+tourRouter.route("/:id").delete(checkPermission('admin'|| 'moderator'),deleteTour).get(getOneTour).patch(checkPermission('admin'|| 'moderator'),updateTour);
 

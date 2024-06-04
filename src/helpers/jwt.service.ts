@@ -43,3 +43,29 @@ export const verifyToken = (token: string) => {
       },
     });
   }
+
+  export const sendToken = (user:any, statusCode: number, res: Response) =>{
+    const token = generateToken(user._id);
+    const cookieOptions = {
+      expires: new Date(
+        Date.now() + Number(process.env.JWT_COOKIE_EXPIRES_IN) * 1000
+      ),
+      secure: false,
+      httpOnly: true,
+    };
+    if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+    res.cookie("jwt", token, cookieOptions);
+    user.password = undefined;
+    user.passwordConfirm = undefined;
+    user.__v = undefined;
+    user.active = undefined;
+    user.role = undefined;
+    user.passwordChangedAt = undefined;
+    
+    return res.status(statusCode).json({
+      status: "success",
+      data: {
+        user
+      },
+    });
+  }

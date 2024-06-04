@@ -3,7 +3,7 @@ import { config } from "dotenv";
 import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../../helpers/catchAsync";
 import { encryptPassword, verifyPassword } from "../../../helpers/encrypt";
-import { createSendToken, generateToken } from "../../../helpers/jwt.service";
+import { createSendToken, generateToken, sendToken } from "../../../helpers/jwt.service";
 import { User } from "../../../Model/Users";
 import { AppError } from "../../../utils/appError";
 import { sendEmail } from "../../../utils/Emails";
@@ -166,15 +166,8 @@ export const loginController = catchAsync(
 
 
 
-    const token = generateToken(`${dataFind?._id}`);
-
-    res.status(200).json({
-      status: "success",
-      token,
-      user: {
-        id: dataFind?._id,
-      },
-    });
+    const token = sendToken(dataFind, 200, res);
+    return token;
   }
 );
 
