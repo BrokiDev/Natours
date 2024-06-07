@@ -241,6 +241,10 @@ export const resetPasswordController = catchAsync(
       return next(new AppError("Token invalid or has expired", 400));
     }
 
+    if(user.passwordResetExpires! < new Date()){
+      return next(new AppError("Token has expired", 400));
+    }
+
     const passwordEncrypt = await encryptPassword(
       body.password,
       Number(process.env.SALTS_ROUND)

@@ -10,6 +10,8 @@ import { AppError } from "./utils/appError";
 import rateLimit from "express-rate-limit";
 import ExpressMongoSanitize from "express-mongo-sanitize";
 import xss from "xss";
+import hpp from "hpp";
+import helmet from "helmet";
 
 const app = express();
 
@@ -25,7 +27,19 @@ if(env === 'development') {
 
 app.use(ExpressMongoSanitize())
 app.use(express.json());
-app.use(xss('<script>alert("xss");</script>'))
+// app.use(xss('<script>alert("xss");</script>',{whiteList: {}}))
+
+app.use(hpp({
+  whitelist: [
+    'duration',
+    'ratingsQuantity',
+    'ratingsAverage',
+    'maxGroupSize',
+    'difficulty',
+    'price'
+  ]
+}))
+app.use(helmet())
 app.use(express.static(`${__dirname}/public/`))
 
 
